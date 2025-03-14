@@ -1,0 +1,8 @@
+
+{
+  "singlecuote": true,
+  "tabWidth": 2,
+  "arrowParens" : "always",
+  "printWidth": 80
+
+}
