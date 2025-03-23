@@ -5,7 +5,8 @@ import { FinderUserService } from './services/finder-user-service';
 import { UpdateUserService } from './services/update-user-service';
 import { EliminatorUserService } from './services/eliminator-user-service';
 import { LoginUserService } from './services/login-user-service';
-import { CreateUserDto, UpdateUserDto } from '../../domain';
+import { CreateUserDto, LoginUserDto, UpdateUserDto } from '../../domain';
+import { envs } from '../../config';
 
 export class UserController {
 	constructor(
@@ -39,6 +40,7 @@ export class UserController {
 
 	findOne = (req: Request, res: Response) => {
 		const { id } = req.params;
+
 		this.finderUserService
 			.execute(id)
 			.then((user) => res.status(200).json(user))
@@ -69,7 +71,22 @@ export class UserController {
 	};
 
 	login = (req: Request, res: Response) => {
-		const { email, password } = req.body;
-		this.loginUserService.execute(email, password, res);
+		const [error, loginUserDto] = LoginUserDto.execute(req.body);
+		if (error) {
+			return res.status(422).json({ message: error });
+		}
+		this.loginUserService
+			.execute(loginUserDto!)
+			.then((data) => {
+				res.cookie('token', data.token, {
+					httpOnly: true,
+					secure: envs.NODE_ENV === 'production',
+					sameSite: 'strict',
+					maxAge: 5 * 60 * 60 * 1000,
+				});
+				return res.status(200).json({ user: data.user });
+			})
+
+			.catch((err) => res.status(404).json({ message: err.message }));
 	};
 }

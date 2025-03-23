@@ -1,3 +1,4 @@
+import { encriptAdapter } from '../../../config';
 import { User } from '../../../data/postgres/models/user-model';
 import { CreateUserDto } from '../../../domain';
 
@@ -7,7 +8,7 @@ export class RegisterUserService {
 
 		user.fullname = userData.fullname;
 		user.email = userData.email;
-		user.password = userData.password;
+		user.password = this.encriptPassword(userData.password);
 		user.phone_number = userData.phone_number;
 
 		try {
@@ -18,5 +19,8 @@ export class RegisterUserService {
 		} catch (error) {
 			throw new Error('An error ocurred while registering the user');
 		}
+	}
+	private encriptPassword(password: string): string {
+		return encriptAdapter.hash(password);
 	}
 }

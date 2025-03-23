@@ -6,6 +6,8 @@ import { FinderUserService } from './services/finder-user-service';
 import { UpdateUserService } from './services/update-user-service';
 import { EliminatorUserService } from './services/eliminator-user-service';
 import { LoginUserService } from './services/login-user-service';
+import { AuthMiddleware } from '../common/middlewares/auth-middleware';
+import { UserRole } from '../../data/postgres/models/user-model';
 
 export class UserRoutes {
 	static get routes(): Router {
@@ -31,13 +33,31 @@ export class UserRoutes {
 
 		router.post('/login', controller.login);
 
-		router.get('/', controller.findAll);
+		router.use(AuthMiddleware.protect);
 
-		router.get('/:id', controller.findOne);
+		router.get(
+			'/',
+			AuthMiddleware.restrictTo(UserRole.ADMIN),
+			controller.findAll,
+		);
 
-		router.patch('/:id', controller.update);
+		router.get(
+			'/:id',
+			AuthMiddleware.restrictTo(UserRole.ADMIN),
+			controller.findOne,
+		);
 
-		router.delete('/:id', controller.delete);
+		router.patch(
+			'/:id',
+			AuthMiddleware.restrictTo(UserRole.ADMIN),
+			controller.update,
+		);
+
+		router.delete(
+			'/:id',
+			AuthMiddleware.restrictTo(UserRole.ADMIN),
+			controller.delete,
+		);
 
 		return router;
 	}
