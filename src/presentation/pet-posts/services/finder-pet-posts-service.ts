@@ -4,9 +4,18 @@ export class FinderPetPostsService {
 	async execute() {
 		try {
 			return await PetPost.find({
-				select: ['id', 'pet_name', 'status', 'owner', 'hasFound'],
 				where: {
 					hasFound: false,
+				},
+				relations: {
+					user: true,
+				},
+				select: {
+					user: {
+						id: true,
+						fullname: true,
+						email: true,
+					},
 				},
 			});
 		} catch (error) {

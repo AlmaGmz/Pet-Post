@@ -9,7 +9,7 @@ export class UpdatePetPostService {
 		const updatePetPostService = await this.ensurePostExits(userId);
 
 		if (userData.pet_name) updatePetPostService.pet_name = userData.pet_name;
-		if (userData.owner) updatePetPostService.owner = userData.owner;
+
 		if (userData.description)
 			updatePetPostService.description = userData.description;
 
